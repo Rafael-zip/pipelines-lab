@@ -35,5 +35,5 @@ on:
           echo "Este e o lab 01 do curso de GitHub Actions"
           echo "Workflow executado com sucesso"
           echo "Pronto para os proximos desafios"
-          echo "Vamos aprender mais sobre CI/CD"
+          echo "Vamos aprender mais sobre workflow"
           
