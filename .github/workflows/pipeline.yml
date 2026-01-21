@@ -1,37 +1,40 @@
-name: Hello GitHub Actions
+name: "Estrutura de Diretorios e Arquivos"
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
+env:
+  NODE-VERSION: '18'|
+
 jobs:
-  hello-job:
+  demonstrar-estrutra:
+    name: "Demonstrar Estrutura Basica"
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Codigo
+      - name: "Checkout Repository"
         uses: actions/checkout@v4
 
-      - name: Executar Hello World
-        run: echo "Hello GitHub Actions"
-
-      - name: Mostrar Informações do Sistema
+      - name: Mostrar estrutura .github/workflows
         run: |
-          echo "Sistema Operacional: ${{ runner.os }}"
-          echo "Diretorio atual: $(pwd)"
-          echo "Data atual: $(date)"
-          echo "Usuario: $(whoami)"
+          echo "=== ESTRUTURA DO DIRETORIO .github/workflows ==="
+          ls -la .github/workflows/
+          echo ""
+          echo "Total de workflows: $(ls -1 .github/workflows/*.yaml 2> /dev/null | wc -l)"
 
-      - name: Listar Arquivos do repositorio
-        run: ls -la
-
-      - name: Comandos multiplos
+      - name: Elementos obrigatorios do workflow
         run: |
-          echo "Este e o lab 01 do curso de GitHub Actions"
-          echo "Workflow executado com sucesso"
-          echo "Pronto para os proximos desafios"
+          echo "=== ELEMENTOS OBRIGATORIOS ==="
+          echo "1. name: Nome do workflow"
+          echo "2. on: Eventos de trigger (push, workflow_dispatch)"
+          echo "3. jobs: Tarefas a executar"
+
+      - name: Variaveis de contexto
+        run: |
+          echo "=== VARIAVEIS DE CONTEXTO ==="
+          echo "Variavel env: ${{ env.NODE-VERSION }}"
+          echo "Repositorio: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}" 
+          echo "Actor: ${{ github.actor }}"         
