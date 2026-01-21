@@ -2,14 +2,15 @@ name: "Estrutura de Diretorios e Arquivos"
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
-  env:
-    NODE-VERSION: '18'
+env:
+  NODE-VERSION: '18'
 
 jobs:
-  demonstrar-estrutra:
+  demonstrar-estrutura:
     name: "Demonstrar Estrutura Basica"
     runs-on: ubuntu-latest
 
@@ -22,7 +23,7 @@ jobs:
           echo "=== ESTRUTURA DO DIRETORIO .github/workflows ==="
           ls -la .github/workflows/
           echo ""
-          echo "Total de workflows: $(ls -1 .github/workflows/*.yaml 2> /dev/null | wc -l)"
+          echo "Total de workflows: $(ls -1 .github/workflows/*.yml 2> /dev/null | wc -l)"
 
       - name: Elementos obrigatorios do workflow
         run: |
@@ -36,5 +37,5 @@ jobs:
           echo "=== VARIAVEIS DE CONTEXTO ==="
           echo "Variavel env: ${{ env.NODE-VERSION }}"
           echo "Repositorio: ${{ github.repository }}"
-          echo "Branch: ${{ github.ref_name }}" 
-          echo "Actor: ${{ github.actor }}"         
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Actor: ${{ github.actor }}"
