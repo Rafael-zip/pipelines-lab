@@ -5,8 +5,8 @@ on:
     branches: [main]
   workflow_dispatch:
 
-env:
-  NODE-VERSION: '18'|
+  env:
+    NODE-VERSION: '18'
 
 jobs:
   demonstrar-estrutra:
