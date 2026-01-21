@@ -1,32 +1,32 @@
-name: "Workflow Agendado - Relatório Diário"
+name: push Trigger Workflow
 
+### Executa apenas em Push
 on:
-  schedule:
-    # Executa todos os dias às 00:55 UTC
-    - cron: '55 00 * * *'
-  workflow_dispatch:
-
+  push:
+    branches:
+      - main
+      - develop
+    paths: 
+      - 'src/**' #criar esses arquivos para funcionar 
+      - 'README.md' #criar esses arquivos para funcionar
+    
 jobs:
-  schedule-job:
-    name: "Job Agendado"
+  push-job:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout codigo
+      - name: Checkout Codigo
         uses: actions/checkout@v4
 
-      - name: Informacoes do Schedule
+      - name: Informacoes do Push
         run: |
-          echo "Workflow disparado por Schedule"
-          echo "Data local: $(date)"
-          echo "Hora UTC: $(date -u)"
-          echo "Timezone: $(date +%Z)"
+          echo "Workflow disparado por push"
+          echo "commit: ${{ github.sha }}"
+          echo "Autor: ${{ github.actor }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Repositorio: ${{ github.repository }}"
 
-      - name: Relatorio diario automatizado
+      - name: Listar arquivos modificados
         run: |
-          echo "RELATORIO DIARIO AUTOMATIZADO"
-          echo "=============================="
-          echo "Total de commits: $(git rev-list --count HEAD)"
-          echo "Contribuidores unicos: $(git shortlog -s --all | wc -l)"
-          echo "Ultimo commit:"
-          git log -1 --pretty=format:'%h - %an, %ar : %s'
+          echo "Arquivos no repositorio:"
+          ls -la
