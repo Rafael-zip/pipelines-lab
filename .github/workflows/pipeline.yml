@@ -1,11 +1,14 @@
+name: "Workflow Agendado - Relatório Diário"
+
 on:
   schedule:
-      # Executa as 21:51 (UTC)
+    # Executa todos os dias às 00:55 UTC
     - cron: '55 00 * * *'
   workflow_dispatch:
 
 jobs:
-  echedule-job:
+  schedule-job:
+    name: "Job Agendado"
     runs-on: ubuntu-latest
 
     steps:
@@ -15,14 +18,15 @@ jobs:
       - name: Informacoes do Schedule
         run: |
           echo "Workflow disparado por Schedule"
-          echo "Data atual: $(date)"
+          echo "Data local: $(date)"
           echo "Hora UTC: $(date -u)"
-          echo "Timazone: $(date +%Z)"
+          echo "Timezone: $(date +%Z)"
 
       - name: Relatorio diario automatizado
         run: |
           echo "RELATORIO DIARIO AUTOMATIZADO"
           echo "=============================="
-          echo "Total de commits: $(git rev-list --count)"
-          echo "Contribuidores unicos: $(git shortlog -s | wc -l)"
-          echo "Ultimo commit: $(git log -1 --pretty=format:'%h - %an, %ar : %s')
+          echo "Total de commits: $(git rev-list --count HEAD)"
+          echo "Contribuidores unicos: $(git shortlog -s --all | wc -l)"
+          echo "Ultimo commit:"
+          git log -1 --pretty=format:'%h - %an, %ar : %s'
