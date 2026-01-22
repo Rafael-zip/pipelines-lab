@@ -14,7 +14,6 @@ env:
 
 jobs:
   demonstracao-variaveis:
-    name: Job de Demonstracao de Variaveis
     runs-on: ubuntu-latest
 
     # Variaveis de ambiente no nivel de job
@@ -45,7 +44,7 @@ jobs:
           echo "STEP_VAR: ${{ env.STEP_VAR }}"
           echo "MENSAGEM: ${{ env.MENSAGEM }}"
 
-          - name: Combinar variaveis de diferentes niveis
+      - name: Combinar variaveis de diferentes niveis
         env:
           STEP_SPECIFICO: "step-value"
         run: |
