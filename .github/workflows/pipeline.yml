@@ -1,5 +1,6 @@
-name: Isssue trigger Workflow
-#permissoes para permitir comentarios automaticos
+name: Issue Trigger Workflow
+
+# Permissões para permitir comentários automáticos
 permissions:
   issues: write
 
@@ -8,20 +9,27 @@ on:
     types: [opened, edited, closed, labeled]
 
 jobs:
- issue-job:
-   runs-on: ubuntu-latest
+  issue-job:
+    name: Job acionado por Issue
+    runs-on: ubuntu-latest
 
-   steps:
-      - name: Informacoes de issue
+    steps:
+      - name: Informacoes da issue
         run: |
           echo "Workflow disparado por issue"
           echo "Acao: ${{ github.event.action }}"
-          echo "Issue: ${{ github.event.issue.number }}"
+          echo "Issue: #${{ github.event.issue.number }}"
           echo "Titulo: ${{ github.event.issue.title }}"
           echo "Autor: ${{ github.event.issue.user.login }}"
-          echo "Labels: ${{ github.event.issue.labels.*.name,', ') }}"
 
-      - name: Resposta autmatica (nova issue)
+      - name: Listar labels da issue
+        run: |
+          echo "Labels:"
+          for label in ${{ toJson(github.event.issue.labels) }}; do
+            echo "$label"
+          done
+
+      - name: Resposta automatica (nova issue)
         if: github.event.action == 'opened'
         uses: actions/github-script@v7
         with:
@@ -30,6 +38,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Obrigado por reportar esta issue! Nossa equipe ira analisar em breve."
+              body: "Obrigado por reportar esta issue! Nossa equipe irá analisar em breve."
             })
+
       
