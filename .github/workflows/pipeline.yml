@@ -1,4 +1,4 @@
-name: Jobs Paralelos
+name: Matrix Strategy
 
 on:
   push:
@@ -6,84 +6,66 @@ on:
   workflow_dispatch:
 
 jobs:
-  code-analysis:
-    name: Analise de Codigo
-    runs-on: ubuntu-latest
+  test-matrix:
+    name: Testes em Matriz
+    runs-on: ${{ matrix.os }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Analise de sintaxe
-        run: |
-          echo "Analisando sintaxe do codigo..."
-          sleep 3
-          echo "Analise de sintaxe concluida."
-
-      - name: Verificar padroes de codigo
-        run: |
-          echo "Verificando padroes de codigo..."
-          sleep 2
-          echo "Padroes verificados."
-
-      - name: Gerar relatorio de analise
-        run: |
-          echo "Relatorio de analise gerado em $(date)" > analysis-report.txt
-          echo "Relatorio salvo."
-
-  unit-tests:
-    name: Testes Unitarios
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Configurar ambiente de testes
-        run: |
-          echo "Configurando ambiente de testes..."
-          sleep 2
-          echo "Ambiente configurado."
-
-      - name: Executar testes unitarios
-        run: |
-          echo "Executando testes unitarios..."
-          sleep 4
-          echo "Todos os testes unitarios passaram (15/15)."
-
-      - name: Gerar relatorio de cobertura
-        run: |
-          echo "Cobertura: 85%" > coverage.txt
-          echo "Relatorio de cobertura gerado."
-
-  build:
-    name: Build da Aplicacao
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # Não para se um job falhar
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [16, 18, 20]
+        include:
+          # Configuracoes especificas
+          - os: ubuntu-latest
+            node-version: 20
+            experimental: true
+        exclude:
+          # Excluir combinacoes problematicas
+          - os: windows-latest
+            node-version: 16
 
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4
 
-      - name: Configurar ambiente de build
+      - name: Informacoes da matrix
         run: |
-          echo "Configurando ambiente de build..."
-          sleep 2
-          echo "Ambiente de build configurado."
+          echo "OS: ${{ matrix.os }}"
+          echo "Node: ${{ matrix['node-version'] }}"
+          echo "Experimental: ${{ matrix.experimental }}"
 
-      - name: Compilar aplicacao
-        run: |
-          echo "Compilando aplicacao..."
-          sleep 5
-          echo "Build concluido com sucesso."
-
-      - name: Gerar artefatos
-        run: |
-          mkdir -p build
-          echo "Aplicacao compilada em $(date)" > build/app.jar
-          echo "Artefatos gerados."
-
-      - name: Upload artefatos
-        uses: actions/upload-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: build-artifacts
-          path: build/
+          node-version: ${{ matrix['node-version'] }}
+
+      - name: Verificar versoes
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+
+      - name: Executar testes especificos do OS
+        run: |
+          echo "Executando testes no ${{ matrix.os }} com Node.js ${{ matrix['node-version'] }}"
+          sleep 2
+          echo "Testes concluídos"
+
+      - name: Teste experimental
+        if: matrix.experimental == true
+        run: |
+          echo "Executando testes experimentais"
+          sleep 1
+          echo "Testes experimentais concluídos"
+
+  collect-results:
+    name: Coletar Resultados
+    runs-on: ubuntu-latest
+    needs: test-matrix
+
+    steps:
+      - name: Coletar resultados
+        run: |
+          echo "Coletando resultados dos testes de todos os jobs da matrix"
+          sleep 2
+          echo "Todos os testes da matrix foram executados"
