@@ -14,6 +14,7 @@ env:
 
 jobs:
   demonstracao-variaveis:
+    name: Job de Demonstracao de Variaveis
     runs-on: ubuntu-latest
 
     # Variaveis de ambiente no nivel de job
@@ -53,14 +54,3 @@ jobs:
           echo "Job Var: ${{ env.JOB_VAR }}"
           echo "Step Var: ${{ env.STEP_SPECIFICO }}"
           echo "Todas acessiveis no mesmo contexto!"
-
-      - name: Usar variaveis em comandos praticos
-        env:
-          NOME_PROJETO: "lab-variaveis"
-          TIMESTAMP: "2025-01-13"
-        run: |
-          echo "=== Exemplo pratico ==="
-          echo "Compilando projeto: ${{ env.NOME_PROJETO }}"
-          echo "Data de build: ${{ env.TIMESTAMP }}"
-          echo "Ambiente de deploy: ${{ env.AMBIENTE }}"
-          echo "Versao: ${{ env.VERSAO_APP }}"
