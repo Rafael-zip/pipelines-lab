@@ -1,44 +1,89 @@
-name: Issue Trigger Workflow
-
-# Permissões para permitir comentários automáticos
-permissions:
-  issues: write
+name: Jobs Paralelos
 
 on:
-  issues:
-    types: [opened, edited, closed, labeled]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  issue-job:
-    name: Job acionado por Issue
+  code-analysis:
+    name: Analise de Codigo
     runs-on: ubuntu-latest
 
     steps:
-      - name: Informacoes da issue
-        run: |
-          echo "Workflow disparado por issue"
-          echo "Acao: ${{ github.event.action }}"
-          echo "Issue: #${{ github.event.issue.number }}"
-          echo "Titulo: ${{ github.event.issue.title }}"
-          echo "Autor: ${{ github.event.issue.user.login }}"
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Listar labels da issue
+      - name: Analise de sintaxe
         run: |
-          echo "Labels:"
-          for label in ${{ toJson(github.event.issue.labels) }}; do
-            echo "$label"
-          done
+          echo "Analisando sintaxe do codigo..."
+          sleep 3
+          echo "Analise de sintaxe concluida."
 
-      - name: Resposta automatica (nova issue)
-        if: github.event.action == 'opened'
-        uses: actions/github-script@v7
+      - name: Verificar padroes de codigo
+        run: |
+          echo "Verificando padroes de codigo..."
+          sleep 2
+          echo "Padroes verificados."
+
+      - name: Gerar relatorio de analise
+        run: |
+          echo "Relatorio de analise gerado em $(date)" > analysis-report.txt
+          echo "Relatorio salvo."
+
+  unit-tests:
+    name: Testes Unitarios
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configurar ambiente de testes
+        run: |
+          echo "Configurando ambiente de testes..."
+          sleep 2
+          echo "Ambiente configurado."
+
+      - name: Executar testes unitarios
+        run: |
+          echo "Executando testes unitarios..."
+          sleep 4
+          echo "Todos os testes unitarios passaram (15/15)."
+
+      - name: Gerar relatorio de cobertura
+        run: |
+          echo "Cobertura: 85%" > coverage.txt
+          echo "Relatorio de cobertura gerado."
+
+  build:
+    name: Build da Aplicacao
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar ambiente de build
+        run: |
+          echo "Configurando ambiente de build..."
+          sleep 2
+          echo "Ambiente de build configurado."
+
+      - name: Compilar aplicacao
+        run: |
+          echo "Compilando aplicacao..."
+          sleep 5
+          echo "Build concluido com sucesso."
+
+      - name: Gerar artefatos
+        run: |
+          mkdir -p build
+          echo "Aplicacao compilada em $(date)" > build/app.jar
+          echo "Artefatos gerados."
+
+      - name: Upload artefatos
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "Obrigado por reportar esta issue! Nossa equipe irá analisar em breve."
-            })
-
-      
+          name: build-artifacts
+          path: build/
