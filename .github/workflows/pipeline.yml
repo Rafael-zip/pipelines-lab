@@ -1,60 +1,94 @@
-name: Demo GitHub Secrets
+name: Deploy Multi-ambientes
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
-  demonstrar-secrets:
+  # Job 1: Mostrar variáveis do repositório
+  mostrar-variaveis-repositorio:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout do codigo
-      - name: Fazer checkout do repositorio
-        uses: actions/checkout@v4
-
-      # Step 2: Demonstrar uso de secrets como variaveis de ambiente
-      - name: Configurar credenciais de API
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-          API_URL: ${{ secrets.API_URL }}
+      - name: Exibir variáveis do repositório
         run: |
-          echo "Configurando conexao com API externa..."
-          echo "API URL: $API_URL"
-          echo "API Key esta configurada: ${API_KEY:+SIM}"
+          echo "=== Variáveis do repositório ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Região padrão: ${{ vars.DEFAULT_REGION }}"
+          echo "Timeout padrão: ${{ vars.DEFAULT_TIMEOUT }}"
+          echo "Versão do Node: ${{ vars.NODE_VERSION }}"
 
-      # Step 3: Simular conexao com banco de dados usando secrets
-      - name: Conectar ao banco de dados
-        env:
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_PORT: ${{ secrets.DB_PORT }}
+  # Job 2: Deploy em Desenvolvimento
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: mostrar-variaveis-repositorio
+    steps:
+      - name: Configurar ambiente DEV
         run: |
-          echo "Configurando conexao ao banco de dados..."
-          echo "Host: $DB_HOST"
-          echo "Porta: $DB_PORT"
-          echo "Usuario: $DB_USERNAME"
-          echo "Senha: $DB_PASSWORD"
-          echo "Observe que a senha sera automaticamente mascarada nos logs"
+          echo "=== DEPLOY EM DESENVOLVIMENTO ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Ambiente: ${{ vars.ENVIRONMENT }}"
+          echo "API URL: ${{ vars.API_URL }}"
+          echo "Database: ${{ vars.DATABASE_NAME }}"
+          echo "Região: ${{ vars.DEFAULT_REGION }}"
+          echo "Debug Mode: ${{ vars.DEBUG_MODE }}"
+          echo "Max Connections: ${{ vars.MAX_CONNECTIONS }}"
 
-      # Step 4: Usar secret como token de deploy
-      - name: Preparar deploy com token
-        env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+      - name: Simular build DEV
         run: |
-          echo "Preparando deploy..."
-          echo "Token de deploy configurado com sucesso"
-          echo "O GitHub mascara automaticamente o valor real do token"
+          echo "Compilando aplicação para ${{ vars.ENVIRONMENT }}"
+          echo "URL de destino: ${{ vars.API_URL }}"
+          sleep 2
+          echo "Build concluído em DEV"
 
-      # Step 5: Demonstrar boas praticas de seguranca
-      - name: Verificar seguranca dos secrets
+  # Job 3: Deploy em Staging
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    needs: deploy-dev
+    steps:
+      - name: Configurar ambiente STAGING
         run: |
-          echo "=== Seguranca dos Secrets ==="
-          echo "- Secrets nunca aparecem em logs (sao substituidos por ***)"
-          echo "- Secrets nao sao acessiveis em forks do repositorio"
-          echo "- Secrets podem ser alterados sem modificar o codigo"
-          echo "- Secrets so ficam disponiveis durante a execucao do workflow"
-          echo "============================="
+          echo "=== DEPLOY EM STAGING ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Ambiente: ${{ vars.ENVIRONMENT }}"
+          echo "API URL: ${{ vars.API_URL }}"
+          echo "Database: ${{ vars.DATABASE_NAME }}"
+          echo "Região: ${{ vars.DEFAULT_REGION }}"
+          echo "Debug Mode: ${{ vars.DEBUG_MODE }}"
+          echo "Max Connections: ${{ vars.MAX_CONNECTIONS }}"
+
+      - name: Executar testes de integração
+        run: |
+          echo "Executando testes em ${{ vars.ENVIRONMENT }}"
+          echo "Endpoint: ${{ vars.API_URL }}/health"
+          sleep 2
+          echo "Testes aprovados em STAGING"
+
+  # Job 4: Deploy em Produção
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: deploy-staging
+    steps:
+      - name: Configurar ambiente PRODUÇÃO
+        run: |
+          echo "=== DEPLOY EM PRODUÇÃO ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Ambiente: ${{ vars.ENVIRONMENT }}"
+          echo "API URL: ${{ vars.API_URL }}"
+          echo "Database: ${{ vars.DATABASE_NAME }}"
+          echo "Região: ${{ vars.DEFAULT_REGION }}"
+          echo "Debug Mode: ${{ vars.DEBUG_MODE }}"
+          echo "Max Connections: ${{ vars.MAX_CONNECTIONS }}"
+
+      - name: Deploy em Produção
+        run: |
+          echo "Realizando deploy em ${{ vars.ENVIRONMENT }}"
+          echo "URL pública: ${{ vars.API_URL }}"
+          sleep 3
+          echo "Deploy em PRODUÇÃO concluído com sucesso"
+
+      - name: Notificar equipe
+        run: |
+          echo "Enviando notificação de deploy para ${{ vars.API_URL }}"
+          echo "Versão implantada: ${{ vars.APP_NAME }} em ${{ vars.ENVIRONMENT }}"
