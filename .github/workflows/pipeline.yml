@@ -57,3 +57,4 @@ jobs:
           echo "- Secrets nao sao acessiveis em forks do repositorio"
           echo "- Secrets podem ser alterados sem modificar o codigo"
           echo "- Secrets so ficam disponiveis durante a execucao do workflow"
+          echo "============================="
